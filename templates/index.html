@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Bloch Sphere Visualization</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Quantum Bloch Sphere Visualization</h1>
+
+    <div id="graph-container">
+        <!-- Initial plot will be replaced by AJAX response -->
+    </div>
+
+    <div>
+        <label for="theta">Theta (θ): </label>
+        <input type="range" id="theta" min="0" max="3.14159" step="0.01" value="1.57">
+        <span id="theta-value">1.57</span>
+
+        <label for="phi">Phi (φ): </label>
+        <input type="range" id="phi" min="0" max="6.28318" step="0.01" value="0">
+        <span id="phi-value">0</span>
+    </div>
+
+    <script>
+        function updatePlot() {
+            const theta = parseFloat($('#theta').val());
+            const phi = parseFloat($('#phi').val());
+
+            $('#theta-value').text(theta.toFixed(2));
+            $('#phi-value').text(phi.toFixed(2));
+
+            $.ajax({
+                url: '/update_plot',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ theta: theta, phi: phi }),
+                success: function(response) {
+                    $('#graph-container').html(response.graph_html);
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            updatePlot();  // Load initial plot
+
+            $('#theta, #phi').on('input', function() {
+                updatePlot();
+            });
+        });
+    </script>
+</body>
+</html>
